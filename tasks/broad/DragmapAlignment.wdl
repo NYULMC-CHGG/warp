@@ -32,9 +32,9 @@ task SamToFastqAndDragmapAndMba {
     Boolean unmap_contaminant_reads = true
 
     String docker = "us.gcr.io/broad-gotc-prod/dragmap:1.1.2-1.2.1-2.26.10-1.11-1643839530"
-    Int cpu = 16
+    Int cpu = 10
     Float disk_multiplier = 8
-    Int memory_mb = 40960
+    Int memory_mb = 25000
   }
 
   Float unmapped_bam_size = size(input_bam, "GiB")

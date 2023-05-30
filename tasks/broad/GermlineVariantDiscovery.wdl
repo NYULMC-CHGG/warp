@@ -100,7 +100,8 @@ task HaplotypeCaller_GATK4_VCF {
     Int memory_multiplier = 1
   }
   
-  Int memory_size_mb = ceil(8000 * memory_multiplier)
+  #Int memory_size_mb = ceil(50000 * memory_multiplier)
+  Int memory_size_mb = 50000
 
   String output_suffix = if make_gvcf then ".g.vcf.gz" else ".vcf.gz"
   String output_file_name = vcf_basename + output_suffix
@@ -123,11 +124,11 @@ task HaplotypeCaller_GATK4_VCF {
     # memory_size_gb because of Cromwell's retry with more memory feature.
     # Note: In the future this should be done using Cromwell's ${MEM_SIZE} and ${MEM_UNIT} environment variables,
     #       which do not rely on the output format of the `free` command.
-    available_memory_mb=$(free -m | awk '/^Mem/ {print $2}')
-    let java_memory_size_mb=available_memory_mb-1024
-    echo Total available memory: ${available_memory_mb} MB >&2
-    echo Memory reserved for Java: ${java_memory_size_mb} MB >&2
-
+    #available_memory_mb=$(free -m | awk '/^Mem/ {print $2}')
+    #let java_memory_size_mb=available_memory_mb-1024
+    #echo Total available memory: ${available_memory_mb} MB >&2
+    #echo Memory reserved for Java: ${java_memory_size_mb} MB >&2
+    let java_memory_size_mb=$((~{memory_size_mb} - 1024))
     gatk --java-options "-Xmx${java_memory_size_mb}m -Xms${java_memory_size_mb}m -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10" \
       HaplotypeCaller \
       -R ~{ref_fasta} \
@@ -151,7 +152,7 @@ task HaplotypeCaller_GATK4_VCF {
     docker: gatk_docker
     preemptible: preemptible_tries
     memory: "~{memory_size_mb} MiB"
-    cpu: "2"
+    cpu: "5"
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -186,6 +187,7 @@ task MergeVCFs {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
     memory: "3000 MiB"
+    cpu: 2
     disks: "local-disk ~{disk_size} HDD"
   }
   output {
@@ -227,6 +229,7 @@ task Reblock {
 
   runtime {
     memory: "3750 MiB"
+    cpu: 2
     disks: "local-disk " + disk_size + " HDD"
     bootDiskSizeGb: 15
     preemptible: 3
@@ -307,6 +310,7 @@ task DragenHardFilterVcf {
     preemptible: preemptible_tries
     memory: "3000 MiB"
     bootDiskSizeGb: 15
+    cpu: 2
     disks: "local-disk " + disk_size + " HDD"
   }
 }

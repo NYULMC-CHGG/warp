@@ -17,6 +17,7 @@ task Md5Sum {
     docker: "gcr.io/gcp-runtimes/ubuntu_16_0_4:latest"
     disks: "local-disk 10 HDD"
     memory: "3.5 GiB"
+    cpu: "1"
     preemptible: 3
   }
 
@@ -45,6 +46,7 @@ task zCall {
     docker: "us.gcr.io/broad-gotc-prod/zcall:4.0.1-1.3-1629910423"
     disks: "local-disk " + disk_size + " HDD"
     memory: "3.5 GiB"
+    cpu: "1"
     preemptible: preemptible_tries
   }
 
@@ -166,6 +168,7 @@ task BafRegress {
     docker: "us.gcr.io/broad-gotc-prod/bafregress:1.0"
     disks: "local-disk " + disk_size + " HDD"
     memory: "3.5 GiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -199,6 +202,7 @@ task VcfToAdpc {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.11"
     disks: "local-disk " + disk_size + " HDD"
     memory: "3500 MiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -228,6 +232,7 @@ task VerifyIDIntensity {
     docker: "us.gcr.io/broad-gotc-prod/verify-id-intensity:e6354872834fe4262354a6b27bfe85ecc1323677-1561566044"
     disks: "local-disk " + disk_size + " HDD"
     memory: "3.5 GiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -273,6 +278,7 @@ task CreateVerifyIDIntensityContaminationMetricsFile {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.11"
     disks: "local-disk " + disk_size + " HDD"
     memory: "3500 MiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -329,6 +335,7 @@ task CollectArraysVariantCallingMetrics {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.11"
     disks: "local-disk " + disk_size + " HDD"
     memory: "3500 MiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -360,6 +367,7 @@ task VcfToIntervalList {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.11"
     disks: "local-disk " + disk_size + " HDD"
     memory: "3500 MiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -408,6 +416,7 @@ task SelectVariants {
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
     memory: "3500 MiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -445,6 +454,7 @@ task SelectIndels {
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
     memory: "3500 MiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -499,6 +509,7 @@ task AutoCall {
     docker: "us.gcr.io/broad-gotc-prod/illumina-iaap-autocall:1.0.2-1.1.0-1629910298"
     disks: "local-disk " + disk_size + " HDD"
     memory: "7 GiB"
+    cpu: 2
     preemptible: preemptible_tries
   }
 
@@ -580,6 +591,7 @@ task SubsetArrayVCF {
     docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
+    cpu: "2"
     memory: "3500 MiB"
   }
 
@@ -644,6 +656,7 @@ task GenotypeConcordance {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.11"
     disks: "local-disk " + disk_size + " HDD"
     memory: "3500 MiB"
+    cpu: "2"
     preemptible: preemptible_tries
   }
 
@@ -680,6 +693,7 @@ task ValidateVariants {
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
     memory: "3500 MiB"
+    cpu: "2"
     preemptible: preemptible_tries
   }
 }
@@ -731,6 +745,7 @@ task CreateExtendedIlluminaManifest {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.11"
     disks: "local-disk " + disk_size + " HDD"
     memory: "14000 MiB"
+    cpu: "2"
     preemptible: preemptible_tries
   }
 

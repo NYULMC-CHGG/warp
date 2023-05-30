@@ -74,7 +74,7 @@ task MarkDuplicates {
     # Sometimes we wish to supply "null" in order to turn off optical duplicate detection
     # This can be desirable if you don't mind the estimated library size being wrong and optical duplicate detection is taking >7 days and failing
     String? read_name_regex
-    Int memory_multiplier = 1
+    Int memory_multiplier = 3
     Int additional_disk = 20
 
     Float? sorting_collection_size_ratio
@@ -110,6 +110,7 @@ task MarkDuplicates {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
     memory: "~{memory_size} GiB"
+    cpu: 2
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -165,6 +166,7 @@ task BaseRecalibrator {
     preemptible: preemptible_tries
     memory: "6000 MiB"
     bootDiskSizeGb: 15
+    cpu: 2
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -231,6 +233,7 @@ task ApplyBQSR {
     preemptible: preemptible_tries
     memory: "~{memory_size} MiB"
     bootDiskSizeGb: 15
+    cpu: 2
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -258,6 +261,7 @@ task GatherBqsrReports {
     docker: gatk_docker
     preemptible: preemptible_tries
     memory: "3500 MiB"
+    cpu: 2
     bootDiskSizeGb: 15
     disks: "local-disk 20 HDD"
   }
@@ -296,6 +300,7 @@ task GatherSortedBamFiles {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
     memory: "${machine_mem_mb} MiB"
+    cpu: 2
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -331,6 +336,7 @@ task GatherUnsortedBamFiles {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
     memory: "3 GiB"
+    cpu: 2
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -381,6 +387,7 @@ task GenerateSubsettedContaminationResources {
     preemptible: preemptible_tries
     memory: "3.5 GiB"
     disks: "local-disk 10 HDD"
+    cpu: 2
     docker: "us.gcr.io/broad-gotc-prod/bedtools:2.27.1"
   }
   output {

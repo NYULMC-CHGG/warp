@@ -64,6 +64,7 @@ task CreateSequenceGroupingTSV {
     preemptible: preemptible_tries
     docker: "us.gcr.io/broad-dsp-gcr-public/base/python:3.9-debian"
     memory: "2 GiB"
+    cpu: "1"
   }
   output {
     Array[Array[String]] sequence_grouping = read_tsv("sequence_grouping.txt")
@@ -112,6 +113,7 @@ task ScatterIntervalList {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/picard-python:1.0.0-2.26.10-1663951039"
     memory: "2000 MiB"
+    cpu: "1"
   }
 }
 
@@ -203,6 +205,8 @@ task SumFloats {
   runtime {
     docker: "us.gcr.io/broad-dsp-gcr-public/base/python:3.9-debian"
     preemptible: preemptible_tries
+    memory: "2 GiB"
+    cpu: 2
   }
 }
 
@@ -218,6 +222,8 @@ task ErrorWithMessage {
 
   runtime {
     docker: "ubuntu:20.04"
+    cpu: "1"
+    memory: "2 GiB"
   }
 }
 
