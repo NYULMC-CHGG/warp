@@ -8,6 +8,19 @@ struct SampleAndUnmappedBams {
   String unmapped_bam_suffix
 }
 
+# add for fastq samples
+struct SampleFastq {
+  String base_file_name
+  String? final_gvcf_base_name
+  File r1
+  File r2
+  String sample_name
+  #Array[File] r1
+  #Array[File] r2
+  #Array[String] sample_name
+  String unmapped_bam_suffix
+}
+
 struct ReferenceFasta {
   File ref_dict
   File ref_fasta

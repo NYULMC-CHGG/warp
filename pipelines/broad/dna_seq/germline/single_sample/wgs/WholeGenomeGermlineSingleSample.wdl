@@ -45,14 +45,14 @@ workflow WholeGenomeGermlineSingleSample {
 
   input {
     SampleAndUnmappedBams sample_and_unmapped_bams
-    #DNASeqSingleSampleReferences references
-    #DragmapReference? dragmap_reference
-    #VariantCallingScatterSettings scatter_settings
-    #PapiSettings papi_settings
-    File dnaSeqSSRef
-    File dragMapRef
-    File papiSettings
-    File variantCallScatter
+    DNASeqSingleSampleReferences references
+    DragmapReference? dragmap_reference
+    VariantCallingScatterSettings scatter_settings
+    PapiSettings papi_settings
+    #File dnaSeqSSRef
+    #File dragMapRef
+    #File papiSettings
+    #File variantCallScatter
 
     File? fingerprint_genotypes_file
     File? fingerprint_genotypes_index
@@ -75,10 +75,10 @@ workflow WholeGenomeGermlineSingleSample {
   }
 
   ## read in data structures config files
-  DNASeqSingleSampleReferences references = read_json(dnaSeqSSRef)
-  DragmapReference dragmap_reference = read_json(dragMapRef)
-  VariantCallingScatterSettings scatter_settings = read_json(variantCallScatter)
-  PapiSettings papi_settings = read_json(papiSettings)
+  #DNASeqSingleSampleReferences references = read_json(dnaSeqSSRef)
+  #DragmapReference dragmap_reference = read_json(dragMapRef)
+  #VariantCallingScatterSettings scatter_settings = read_json(variantCallScatter)
+  #PapiSettings papi_settings = read_json(papiSettings)
 
 
   if (dragen_functional_equivalence_mode && dragen_maximum_quality_mode) {
