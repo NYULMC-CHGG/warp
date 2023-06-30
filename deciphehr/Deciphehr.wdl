@@ -2,6 +2,7 @@ version 1.0
 
 # imports
 import "../structs/dna_seq/DNASeqStructs.wdl"
+import "../tasks/broad/GermlineVariantDiscovery.wdl" as Calling
 import "../pipelines/broad/dna_seq/germline/single_sample/wgs/WholeGenomeGermlineSingleSample.wdl" as ToWGSgermline
 
 # workflow
@@ -56,16 +57,58 @@ workflow Deciphehr{
     }
 
     
-    ## call sex typing
+    ## call XY typing
+    call XYtyping {
+        input: 
+            samid = sample_fastq.sample_name,
+            align_bam = wgs.output_bam,
+            align_index = wgs.output_bam_index
+    }
     
-    ## if Male
-        ## call variants on X and Y par/non-par regions
+    ## if XY
+        if( XYtyping.xy == "XY"){
+            ## call variants on X and Y par/non-par regions
+            call XYregions{}
+            Array[Region] regions = read_json(XYregions.json_regions)
+            scatter( x in regions){
+                call HaplotypeCallerXY{
+                input: ## NEED TO FIGURE OUT THE REFERENCE AND INPUT FILES
+                    fasta_ref = references.reference_fasta.ref_fasta,
+                    fasta_index = references.reference_fasta.ref_fasta_index,
+                    fasta_dict = references.reference_fasta.ref_dict,
+                    input_bam = wgs.output_bam,
+                    input_bam_index = wgs.output_bam_index,
+                    region = x.region,
+                    ploidy = x.ploidy,
+                    mem_size_mb = 20000,
+                    id = x.id
 
-        ## merge vcfs
+                }
+            }
+            #gather vcf outputs and merge into a single gvcf file
+            Array[File] vcfs_to_merge = flatten(select_all([HaplotypeCallerXY.vcf]))
+            Array[File] vcf_indices_to_merge = flatten(select_all([HaplotypeCallerXY.vcf_index]))
+            call Calling.MergeVCFs as MergeVCFs {
+                input:
+                    input_vcfs = vcfs_to_merge,
+                    input_vcfs_indexes = vcf_indices_to_merge,
+                    output_vcf_name = sample_fastq.sample_name+"_XY_autosomes_merged.vcf.gz",
+            }
+            call FinalVCF {
+            input:
+                fasta_ref = references.reference_fasta.ref_fasta,
+                fasta_index = references.reference_fasta.ref_fasta_index,
+                fasta_dict = references.reference_fasta.ref_dict,
+                xy_vcfs = MergeVCFs.output_vcf,
+                input_vcfs_indexes = MergeVCFs.output_vcf_index,
+                autosome_vcf = wgs.output_vcf,
+                autosome_vcf_index = wgs.output_vcf_index,
+                output_name = sample_fastq.sample_name+"_Final_merged.g.vcf.gz"
+            }
+        
+        }
 
-        ## filter
-
-    ## merge with dragen vcf
+    
 
     ## output everything
     output{
@@ -129,6 +172,10 @@ workflow Deciphehr{
 
         File output_vcf = wgs.output_vcf
         File output_vcf_index = wgs.output_vcf_index
+
+        File xytyping = XYtyping.output_ratio
+        File? finaVCF = FinalVCF.vcf
+        File? finalVCF_index = FinalVCF.vcf_index
     }
     meta {
     allowNestedInputs: true
@@ -181,6 +228,141 @@ task ConvertFastqToUbam {
     runtime{
         docker: "us.gcr.io/broad-gotc-prod/dragmap:1.1.2-1.2.1-2.26.10-1.11-1643839530"
         cpu: 2
+        memory: "10000 MiB"
+    }
+}
+task XYtyping {
+    input{
+        String samid
+        File? align_bam
+        File? align_index
+    }
+    command <<<
+
+        x_map=$(samtools idxstats ~{align_bam} | grep "chrX\s" | cut -f 3)
+        x_len=$(samtools idxstats ~{align_bam} | grep "chrX\s" | cut -f 2)
+        x_cov=$(echo "scale=10; ${x_map}/${x_len}" | bc)
+        y_map=$(samtools idxstats ~{align_bam}| grep "chrY\s" | cut -f 3)
+        y_len=$(samtools idxstats ~{align_bam} | grep "chrY\s" | cut -f 2)
+        y_cov=$(echo "scale=10; ${y_map}/${y_len}" | bc)
+        if(( $(echo "${y_cov} == 0" | bc -l) )); then
+            ratio=${x_cov}
+        else
+            ratio=$(echo "scale=10; ${x_cov}/${y_cov}" | bc)
+        fi
+
+        if (( $(echo "${ratio} > 4.00" | bc -l) )); then
+            sex="XX"
+        else
+            sex="XY"
+        fi
+
+        echo "sample x/y sex" | tr ' ' , > ~{samid}.XYratio.csv
+        echo ~{samid} ${ratio} ${sex} | tr ' ' , >> ~{samid}.XYratio.csv
+        echo ${sex}
+
+    >>>
+    output{
+        File output_ratio="~{samid}.XYratio.csv"
+        String xy=read_lines(stdout())
+    }
+    runtime{
+        docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
+        cpu: 2
+        memory: "5000 MiB"
+    }
+}
+task XYregions{
+    input{
+       
+    }
+    command<<<
+        JSON_STRING='[{"region":"chrX:1-10000","ploidy":"1","id":"r1"},{"region":"chrX:10001-2781479","ploidy":"2","id":"r2"},
+                      {"region":"chrX:2781480-155701382","ploidy":"1","id":"r3"},{"region":"chrX:155701383-156030895","ploidy":"2","id":"r4"},
+                      {"region":"chrX:156030896-156040895","ploidy":"1","id":"r5"},{"region":"chrY","ploidy":"1","id":"r6"}]'
+        echo $JSON_STRING > fout.json
+        
+    >>>
+    output{
+        File json_regions = "fout.json"
+    }
+}
+task HaplotypeCallerXY{
+    input{
+        File fasta_ref
+        File fasta_index
+        File fasta_dict
+        File? input_bam
+        File? input_bam_index
+        String region
+        String ploidy
+        String id
+        Int mem_size_mb
+        
+        
+    }
+    command <<<
+        set -e 
+        let java_memory_size_mb=$((~{mem_size_mb} - 1024))
+        gatk --java-options "-Xmx${java_memory_size_mb}m -Xms${java_memory_size_mb}m -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10" \
+        HaplotypeCaller \
+        -R ~{fasta_ref} \
+        -I ~{input_bam} \
+        -L ~{region} \
+        -O ~{id}.vcf.gz \
+        -ploidy ~{ploidy} \
+        -ERC GVCF \
+        -G StandardAnnotation \
+        -G StandardHCAnnotation \
+        -G AS_StandardAnnotation \
+        -RF OverclippedReadFilter
+    >>>
+    output{
+        File vcf = "~{id}.vcf.gz"
+        File vcf_index = "~{id}.vcf.gz.tbi"
+    }
+    runtime{
+        docker:"us.gcr.io/broad-gatk/gatk:4.3.0.0"
+        cpu: 5
+        memory: "~{mem_size_mb} MiB"
+    }
+}
+task FinalVCF {
+    input{
+        File fasta_ref
+        File fasta_index
+        File fasta_dict
+        File xy_vcfs
+        File autosome_vcf
+        File input_vcfs_indexes
+        File autosome_vcf_index
+        String output_name
+        String noXY = "noXY.vcf.gz"
+    }
+    
+    command <<<
+
+        gatk --java-options "-Xms5000m -Xmx5000m" \
+        SelectVariants \
+        -R ~{fasta_ref} \
+        -V ~{autosome_vcf} \
+        -XL chrY \
+        -XL chrX \
+        -O ~{noXY}
+
+        gatk --java-options "-Xms5000m -Xmx5000m" \
+        MergeVcfs \
+        -I ~{xy_vcfs} \
+        -I ~{noXY} \
+        -O ~{output_name}
+    >>>
+    output{
+        File vcf = "~{output_name}"
+        File vcf_index = "~{output_name}.tbi"
+    }
+    runtime{
+        docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
+        cpu: 5
         memory: "10000 MiB"
     }
 }

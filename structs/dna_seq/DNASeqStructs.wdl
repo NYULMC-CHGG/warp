@@ -21,6 +21,12 @@ struct SampleFastq {
   String unmapped_bam_suffix
 }
 
+struct Region{
+    String region
+    String ploidy
+    String id
+}
+
 struct ReferenceFasta {
   File ref_dict
   File ref_fasta

@@ -101,7 +101,8 @@ task HaplotypeCaller_GATK4_VCF {
   }
   
   #Int memory_size_mb = ceil(50000 * memory_multiplier)
-  Int memory_size_mb = 50000
+  #Int memory_size_mb = 50000
+  Int memory_size-mb = 10000
 
   String output_suffix = if make_gvcf then ".g.vcf.gz" else ".vcf.gz"
   String output_file_name = vcf_basename + output_suffix
