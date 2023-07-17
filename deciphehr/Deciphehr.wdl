@@ -16,6 +16,7 @@ workflow Deciphehr{
         File variantCallScatter = "/gpfs/data/chaklab/home/mccafj02/home/repos/warp/structs/dna_seq/VariantCallingScatterSettings.json"
         SampleFastq sample_fastq
         File wgs_coverage_interval_list = "/gpfs/data/chaklab/home/mccafj02/pipelines/reference/hg38/v0/wgs_coverage_regions.hg38.interval_list"
+        Boolean isXY = false
 
     }
 
@@ -64,9 +65,9 @@ workflow Deciphehr{
             align_bam = wgs.output_bam,
             align_index = wgs.output_bam_index
     }
-    
+    #isXY = read_boolean(XYtyping.isXY)
     ## if XY
-        if( XYtyping.xy == "XY"){
+        if( read_boolean(XYtyping.isXY) ){
             ## call variants on X and Y par/non-par regions
             call XYregions{}
             Array[Region] regions = read_json(XYregions.json_regions)
@@ -252,19 +253,20 @@ task XYtyping {
         fi
 
         if (( $(echo "${ratio} > 4.00" | bc -l) )); then
-            sex="XX"
+            sex="false"
         else
-            sex="XY"
+            sex="true"
         fi
 
         echo "sample x/y sex" | tr ' ' , > ~{samid}.XYratio.csv
         echo ~{samid} ${ratio} ${sex} | tr ' ' , >> ~{samid}.XYratio.csv
-        echo ${sex}
+        echo ${sex} > isXY.txt
 
     >>>
     output{
         File output_ratio="~{samid}.XYratio.csv"
-        String xy=read_lines(stdout())
+        File isXY="isXY.txt"
+        #String xy=read_lines(stdout())
     }
     runtime{
         docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
