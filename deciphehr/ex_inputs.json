@@ -1,0 +1,10 @@
+{
+    "Deciphehr.sample_fastq":{
+        "sample_name": "s200520_04936",
+        "r1":"/gpfs/home/mccafj02/chaklab/data/COVID19/plates13_14/fastq/S-200520-04936_S113_L001_R1_001.fastq.gz",
+        "r2":"/gpfs/home/mccafj02/chaklab/data/COVID19/plates13_14/fastq/S-200520-04936_S113_L001_R2_001.fastq.gz",
+        "base_file_name":"s200520_04936",
+        "final_gvcf_base_name":"s200520_04936",
+        "unmapped_bam_suffix":".bam"
+    }
+}
