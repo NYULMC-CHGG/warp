@@ -258,7 +258,7 @@ task XYtyping {
             sex="true"
         fi
 
-        echo "sample x/y sex" | tr ' ' , > ~{samid}.XYratio.csv
+        echo "sample x/y isXY" | tr ' ' , > ~{samid}.XYratio.csv
         echo ~{samid} ${ratio} ${sex} | tr ' ' , >> ~{samid}.XYratio.csv
         echo ${sex} > isXY.txt
 
