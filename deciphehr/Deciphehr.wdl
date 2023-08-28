@@ -82,7 +82,7 @@ workflow Deciphehr{
                     region = x.region,
                     ploidy = x.ploidy,
                     mem_size_mb = 12000,
-                    cpu = 10,
+                    cpu = 6,
                     id = x.id
 
                 }
@@ -333,6 +333,7 @@ task HaplotypeCallerXY{
     runtime{
         docker:"us.gcr.io/broad-gatk/gatk:4.3.0.0"
         cpu: cpu
+        runtime_minutes: 120
         memory: "~{mem_size_mb} MiB"
     }
 }
