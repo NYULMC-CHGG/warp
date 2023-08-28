@@ -32,9 +32,10 @@ task SamToFastqAndDragmapAndMba {
     Boolean unmap_contaminant_reads = true
 
     String docker = "us.gcr.io/broad-gotc-prod/dragmap:1.1.2-1.2.1-2.26.10-1.11-1643839530"
-    Int cpu = 10
+    Int cpu = 8
     Float disk_multiplier = 8
-    Int memory_mb = 25000
+    #Int memory_mb = 25000
+    Int memory_mb = 45000
   }
 
   Float unmapped_bam_size = size(input_bam, "GiB")
@@ -55,7 +56,7 @@ task SamToFastqAndDragmapAndMba {
     mkdir dragen_reference
     mv ~{dragmap_reference.reference_bin} ~{dragmap_reference.hash_table_cfg_bin} ~{dragmap_reference.hash_table_cmp} dragen_reference
 
-    dragen-os -b ~{input_bam} -r dragen_reference --interleaved=1 2> >(tee ~{output_bam_basename}.dragmap.stderr.log >&2) | samtools view -h -O BAM - > aligned.bam
+    dragen-os -b ~{input_bam} --num-threads 7 -r dragen_reference --interleaved=1 2> >(tee ~{output_bam_basename}.dragmap.stderr.log >&2) | samtools view -h -O BAM - > aligned.bam
     java -Dsamjdk.compression_level=~{compression_level} -Xms1000m -Xmx1000m -jar /picard/picard.jar \
       MergeBamAlignment \
       VALIDATION_STRINGENCY=SILENT \
@@ -93,6 +94,7 @@ task SamToFastqAndDragmapAndMba {
     preemptible: preemptible_tries
     memory: "${memory_mb} MiB"
     disks: "local-disk ${disk_size_gb} HDD"
+    runtime_minutes: 210
     cpu: cpu
   }
   output {

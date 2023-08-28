@@ -85,7 +85,8 @@ task MarkDuplicates {
   Float md_disk_multiplier = 3
   Int disk_size = ceil(md_disk_multiplier * total_input_size) + additional_disk
 
-  Float memory_size = 7.5 * memory_multiplier
+  #Float memory_size = 7.5 * memory_multiplier
+  Float memory_size= 35
   Int java_memory_size = (ceil(memory_size) - 2)
 
   # Task is assuming query-sorted input so that the Secondary and Supplementary reads get marked correctly
@@ -110,7 +111,7 @@ task MarkDuplicates {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
     memory: "~{memory_size} GiB"
-    cpu: 2
+    cpu: 1
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -279,7 +280,7 @@ task GatherSortedBamFiles {
     Int compression_level
     Int preemptible_tries
     Int additional_disk = 20
-    Int memory_multiplier = 1
+    Int memory_multiplier = 2
   }
 
   # Multiply the input bam size by two to account for the input and output
@@ -300,7 +301,7 @@ task GatherSortedBamFiles {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
     memory: "${machine_mem_mb} MiB"
-    cpu: 2
+    cpu: 1
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -336,7 +337,7 @@ task GatherUnsortedBamFiles {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
     memory: "3 GiB"
-    cpu: 2
+    cpu: 1
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -387,7 +388,7 @@ task GenerateSubsettedContaminationResources {
     preemptible: preemptible_tries
     memory: "3.5 GiB"
     disks: "local-disk 10 HDD"
-    cpu: 2
+    cpu: 1
     docker: "us.gcr.io/broad-gotc-prod/bedtools:2.27.1"
   }
   output {
@@ -472,7 +473,7 @@ task CheckContamination {
     memory: "7.5 GiB"
     disks: "local-disk " + disk_size + " HDD"
     docker: "us.gcr.io/broad-gotc-prod/verify-bam-id:1.0.1-c1cba76e979904eb69c31520a0d7f5be63c72253-1639071840"
-    cpu: 2
+    cpu: 1
   }
   output {
     File selfSM = "~{output_prefix}.selfSM"

@@ -676,7 +676,7 @@ task CollectVariantCallingMetrics {
   Int disk_size = ceil(size(input_vcf, "GiB") + size(dbsnp_vcf, "GiB")) + 20
 
   command {
-    java -Xms2000m -Xmx2500m -jar /usr/picard/picard.jar \
+    java -Xms8000m -Xmx13000m -jar /usr/picard/picard.jar \
       CollectVariantCallingMetrics \
       INPUT=~{input_vcf} \
       OUTPUT=~{metrics_basename} \
@@ -688,7 +688,7 @@ task CollectVariantCallingMetrics {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
-    memory: "3000 MiB"
+    memory: "15000 MiB"
     cpu: "1"
     disks: "local-disk " + disk_size + " HDD"
   }

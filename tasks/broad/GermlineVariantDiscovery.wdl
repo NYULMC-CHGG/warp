@@ -98,11 +98,13 @@ task HaplotypeCaller_GATK4_VCF {
     File? dragstr_model
     String gatk_docker = "us.gcr.io/broad-gatk/gatk:4.3.0.0"
     Int memory_multiplier = 1
+    Int cpu
   }
   
   #Int memory_size_mb = ceil(50000 * memory_multiplier)
   #Int memory_size_mb = 50000
-  Int memory_size_mb = 10000
+  #Int memory_size_mb = 10000
+  Int memory_size_mb = 12000
 
   String output_suffix = if make_gvcf then ".g.vcf.gz" else ".vcf.gz"
   String output_file_name = vcf_basename + output_suffix
@@ -136,6 +138,7 @@ task HaplotypeCaller_GATK4_VCF {
       -I ~{input_bam} \
       -L ~{interval_list} \
       -O ~{output_file_name} \
+      --native-pair-hmm-threads 5 \
       -contamination ~{default=0 contamination} \
       -G StandardAnnotation -G StandardHCAnnotation ~{true="-G AS_StandardAnnotation" false="" make_gvcf} \
       ~{true="--dragen-mode" false="" run_dragen_mode_variant_calling} \
@@ -153,7 +156,8 @@ task HaplotypeCaller_GATK4_VCF {
     docker: gatk_docker
     preemptible: preemptible_tries
     memory: "~{memory_size_mb} MiB"
-    cpu: "5"
+    cpu: cpu
+    runtime_minutes: 210
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -179,7 +183,7 @@ task MergeVCFs {
   # Using MergeVcfs instead of GatherVcfs so we can create indices
   # See https://github.com/broadinstitute/picard/issues/789 for relevant GatherVcfs ticket
   command {
-    java -Xms2000m -Xmx2500m -jar /usr/picard/picard.jar \
+    java -Xms3000m -Xmx4000m -jar /usr/picard/picard.jar \
       MergeVcfs \
       INPUT=~{sep=' INPUT=' input_vcfs} \
       OUTPUT=~{output_vcf_name}
@@ -187,8 +191,8 @@ task MergeVCFs {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
-    memory: "3000 MiB"
-    cpu: 2
+    memory: "5000 MiB"
+    cpu: 1
     disks: "local-disk ~{disk_size} HDD"
   }
   output {
@@ -230,7 +234,7 @@ task Reblock {
 
   runtime {
     memory: "3750 MiB"
-    cpu: 2
+    cpu: 1
     disks: "local-disk " + disk_size + " HDD"
     bootDiskSizeGb: 15
     preemptible: 3
@@ -274,6 +278,7 @@ task HardFilterVcf {
     preemptible: preemptible_tries
     memory: "3000 MiB"
     bootDiskSizeGb: 15
+    cpu: 1
     disks: "local-disk " + disk_size + " HDD"
   }
 }
@@ -311,7 +316,7 @@ task DragenHardFilterVcf {
     preemptible: preemptible_tries
     memory: "3000 MiB"
     bootDiskSizeGb: 15
-    cpu: 2
+    cpu: 1
     disks: "local-disk " + disk_size + " HDD"
   }
 }
@@ -416,7 +421,7 @@ task FilterVariantTranches {
 
   runtime {
     memory: "7000 MiB"
-    cpu: "2"
+    cpu: "1"
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
     preemptible: preemptible_tries

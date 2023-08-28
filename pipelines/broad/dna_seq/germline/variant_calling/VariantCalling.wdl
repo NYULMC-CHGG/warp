@@ -94,7 +94,8 @@ workflow VariantCalling {
       # Generate GVCF by interval
       call Calling.HaplotypeCaller_GATK4_VCF as HaplotypeCallerGATK4 {
         input:
-          contamination = if run_dragen_mode_variant_calling then 0 else contamination,
+          #contamination = if run_dragen_mode_variant_calling then 0 else contamination,
+          contamination = 0,
           input_bam = input_bam,
           input_bam_index = input_bam_index,
           interval_list = scattered_interval_list,
@@ -109,7 +110,8 @@ workflow VariantCalling {
           use_dragen_hard_filtering = use_dragen_hard_filtering,
           use_spanning_event_genotyping = use_spanning_event_genotyping,
           dragstr_model = DragstrAutoCalibration.dragstr_model,
-          preemptible_tries = agg_preemptible_tries
+          preemptible_tries = agg_preemptible_tries,
+          cpu = 6
        }
 
       if (use_dragen_hard_filtering) {

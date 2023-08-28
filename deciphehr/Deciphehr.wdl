@@ -81,7 +81,8 @@ workflow Deciphehr{
                     input_bam_index = wgs.output_bam_index,
                     region = x.region,
                     ploidy = x.ploidy,
-                    mem_size_mb = 20000,
+                    mem_size_mb = 12000,
+                    cpu = 10,
                     id = x.id
 
                 }
@@ -113,48 +114,48 @@ workflow Deciphehr{
 
     ## output everything
     output{
-        Array[File] quality_yield_metrics = wgs.quality_yield_metrics
+        #Array[File] quality_yield_metrics = wgs.quality_yield_metrics
 
-        Array[File] unsorted_read_group_base_distribution_by_cycle_pdf = wgs.unsorted_read_group_base_distribution_by_cycle_pdf
-        Array[File] unsorted_read_group_base_distribution_by_cycle_metrics = wgs.unsorted_read_group_base_distribution_by_cycle_metrics
-        Array[File] unsorted_read_group_insert_size_histogram_pdf = wgs.unsorted_read_group_insert_size_histogram_pdf
-        Array[File] unsorted_read_group_insert_size_metrics = wgs.unsorted_read_group_insert_size_metrics
-        Array[File] unsorted_read_group_quality_by_cycle_pdf = wgs.unsorted_read_group_quality_by_cycle_pdf
-        Array[File] unsorted_read_group_quality_by_cycle_metrics = wgs.unsorted_read_group_quality_by_cycle_metrics
-        Array[File] unsorted_read_group_quality_distribution_pdf = wgs.unsorted_read_group_quality_distribution_pdf
-        Array[File] unsorted_read_group_quality_distribution_metrics = wgs.unsorted_read_group_quality_distribution_metrics
+        #Array[File] unsorted_read_group_base_distribution_by_cycle_pdf = wgs.unsorted_read_group_base_distribution_by_cycle_pdf
+        #Array[File] unsorted_read_group_base_distribution_by_cycle_metrics = wgs.unsorted_read_group_base_distribution_by_cycle_metrics
+        #Array[File] unsorted_read_group_insert_size_histogram_pdf = wgs.unsorted_read_group_insert_size_histogram_pdf
+        #Array[File] unsorted_read_group_insert_size_metrics = wgs.unsorted_read_group_insert_size_metrics
+        #Array[File] unsorted_read_group_quality_by_cycle_pdf = wgs.unsorted_read_group_quality_by_cycle_pdf
+        #Array[File] unsorted_read_group_quality_by_cycle_metrics = wgs.unsorted_read_group_quality_by_cycle_metrics
+        #Array[File] unsorted_read_group_quality_distribution_pdf = wgs.unsorted_read_group_quality_distribution_pdf
+        #Array[File] unsorted_read_group_quality_distribution_metrics = wgs.unsorted_read_group_quality_distribution_metrics
 
-        File read_group_alignment_summary_metrics = wgs.read_group_alignment_summary_metrics
-        File read_group_gc_bias_detail_metrics = wgs.read_group_gc_bias_detail_metrics
-        File read_group_gc_bias_pdf = wgs.read_group_gc_bias_pdf
-        File read_group_gc_bias_summary_metrics = wgs.read_group_gc_bias_summary_metrics
+        #File read_group_alignment_summary_metrics = wgs.read_group_alignment_summary_metrics
+        #File read_group_gc_bias_detail_metrics = wgs.read_group_gc_bias_detail_metrics
+        #File read_group_gc_bias_pdf = wgs.read_group_gc_bias_pdf
+        #File read_group_gc_bias_summary_metrics = wgs.read_group_gc_bias_summary_metrics
 
         File? cross_check_fingerprints_metrics = wgs.cross_check_fingerprints_metrics
 
-        File selfSM = wgs.selfSM
-        Float contamination = wgs.contamination
+        #File selfSM = wgs.selfSM
+        #Float contamination = wgs.contamination
 
-        File calculate_read_group_checksum_md5 = wgs.calculate_read_group_checksum_md5
+        #File calculate_read_group_checksum_md5 = wgs.calculate_read_group_checksum_md5
 
-        File agg_alignment_summary_metrics = wgs.agg_alignment_summary_metrics
-        File agg_bait_bias_detail_metrics = wgs.agg_bait_bias_detail_metrics
-        File agg_bait_bias_summary_metrics = wgs.agg_bait_bias_summary_metrics
-        File agg_gc_bias_detail_metrics = wgs.agg_gc_bias_detail_metrics
-        File agg_gc_bias_pdf = wgs.agg_gc_bias_pdf
-        File agg_gc_bias_summary_metrics = wgs.agg_gc_bias_summary_metrics
-        File agg_insert_size_histogram_pdf = wgs.agg_insert_size_histogram_pdf
-        File agg_insert_size_metrics = wgs.agg_insert_size_metrics
-        File agg_pre_adapter_detail_metrics = wgs.agg_pre_adapter_detail_metrics
-        File agg_pre_adapter_summary_metrics = wgs.agg_pre_adapter_summary_metrics
-        File agg_quality_distribution_pdf = wgs.agg_quality_distribution_pdf
-        File agg_quality_distribution_metrics = wgs.agg_quality_distribution_metrics
-        File agg_error_summary_metrics = wgs.agg_error_summary_metrics
+        #File agg_alignment_summary_metrics = wgs.agg_alignment_summary_metrics
+        #File agg_bait_bias_detail_metrics = wgs.agg_bait_bias_detail_metrics
+        #File agg_bait_bias_summary_metrics = wgs.agg_bait_bias_summary_metrics
+        #File agg_gc_bias_detail_metrics = wgs.agg_gc_bias_detail_metrics
+        #File agg_gc_bias_pdf = wgs.agg_gc_bias_pdf
+        #File agg_gc_bias_summary_metrics = wgs.agg_gc_bias_summary_metrics
+        #File agg_insert_size_histogram_pdf = wgs.agg_insert_size_histogram_pdf
+        #File agg_insert_size_metrics = wgs.agg_insert_size_metrics
+        #File agg_pre_adapter_detail_metrics = wgs.agg_pre_adapter_detail_metrics
+        #File agg_pre_adapter_summary_metrics = wgs.agg_pre_adapter_summary_metrics
+        #File agg_quality_distribution_pdf = wgs.agg_quality_distribution_pdf
+        #File agg_quality_distribution_metrics = wgs.agg_quality_distribution_metrics
+        #File agg_error_summary_metrics = wgs.agg_error_summary_metrics
 
-        File? fingerprint_summary_metrics = wgs.fingerprint_summary_metrics
-        File? fingerprint_detail_metrics = wgs.fingerprint_detail_metrics
+        #File? fingerprint_summary_metrics = wgs.fingerprint_summary_metrics
+        #File? fingerprint_detail_metrics = wgs.fingerprint_detail_metrics
 
-        File wgs_metrics = wgs.wgs_metrics
-        File raw_wgs_metrics = wgs.raw_wgs_metrics
+        #File wgs_metrics = wgs.wgs_metrics
+        #File raw_wgs_metrics = wgs.raw_wgs_metrics
 
         File duplicate_metrics = wgs.duplicate_metrics
         File? output_bqsr_reports = wgs.output_bqsr_reports
@@ -165,11 +166,11 @@ workflow Deciphehr{
         File? output_bam = wgs.output_bam
         File? output_bam_index = wgs.output_bam_index
 
-        File output_cram = wgs.output_cram
-        File output_cram_index = wgs.output_cram_index
-        File output_cram_md5 = wgs.output_cram_md5
+        #File output_cram = wgs.output_cram
+        #File output_cram_index = wgs.output_cram_index
+        #File output_cram_md5 = wgs.output_cram_md5
 
-        File validate_cram_file_report = wgs.validate_cram_file_report
+        #File validate_cram_file_report = wgs.validate_cram_file_report
 
         File output_vcf = wgs.output_vcf
         File output_vcf_index = wgs.output_vcf_index
@@ -197,8 +198,8 @@ task SampleStruct{
         File fjson = "fout.json"
     }
     runtime{
-        cpu: 2
-        memory: "2000 MiB"
+        cpu: 1
+        memory: "1000 MiB"
     }
 }
 task ConvertFastqToUbam {
@@ -228,8 +229,8 @@ task ConvertFastqToUbam {
     }
     runtime{
         docker: "us.gcr.io/broad-gotc-prod/dragmap:1.1.2-1.2.1-2.26.10-1.11-1643839530"
-        cpu: 2
-        memory: "10000 MiB"
+        cpu: 1
+        memory: "9000 MiB"
     }
 }
 task XYtyping {
@@ -270,7 +271,7 @@ task XYtyping {
     }
     runtime{
         docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
-        cpu: 2
+        cpu: 1
         memory: "5000 MiB"
     }
 }
@@ -288,6 +289,10 @@ task XYregions{
     output{
         File json_regions = "fout.json"
     }
+    runtime{
+        cpu: 1
+        memory: "1000 MiB"
+    }
 }
 task HaplotypeCallerXY{
     input{
@@ -300,6 +305,7 @@ task HaplotypeCallerXY{
         String ploidy
         String id
         Int mem_size_mb
+        Int cpu
         
         
     }
@@ -312,6 +318,7 @@ task HaplotypeCallerXY{
         -I ~{input_bam} \
         -L ~{region} \
         -O ~{id}.vcf.gz \
+        --native-pair-hmm-threads ~{cpu} \
         -ploidy ~{ploidy} \
         -ERC GVCF \
         -G StandardAnnotation \
@@ -325,7 +332,7 @@ task HaplotypeCallerXY{
     }
     runtime{
         docker:"us.gcr.io/broad-gatk/gatk:4.3.0.0"
-        cpu: 5
+        cpu: cpu
         memory: "~{mem_size_mb} MiB"
     }
 }
@@ -364,7 +371,7 @@ task FinalVCF {
     }
     runtime{
         docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
-        cpu: 5
-        memory: "10000 MiB"
+        cpu: 1
+        memory: "6000 MiB"
     }
 }

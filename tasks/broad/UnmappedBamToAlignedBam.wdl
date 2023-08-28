@@ -66,12 +66,12 @@ workflow UnmappedBamToAlignedBam {
     String unmapped_bam_basename = basename(unmapped_bam, sample_and_unmapped_bams.unmapped_bam_suffix)
 
     # QC the unmapped BAM
-    call QC.CollectQualityYieldMetrics as CollectQualityYieldMetrics {
-      input:
-        input_bam = unmapped_bam,
-        metrics_filename = unmapped_bam_basename + ".unmapped.quality_yield_metrics",
-        preemptible_tries = papi_settings.preemptible_tries
-    }
+  #  call QC.CollectQualityYieldMetrics as CollectQualityYieldMetrics {
+  #    input:
+  #      input_bam = unmapped_bam,
+  #      metrics_filename = unmapped_bam_basename + ".unmapped.quality_yield_metrics",
+  #      preemptible_tries = papi_settings.preemptible_tries
+  #  }
 
     if (unmapped_bam_size > cutoff_for_large_rg_in_gb) {
       # Split bam into multiple smaller bams,
@@ -129,12 +129,12 @@ workflow UnmappedBamToAlignedBam {
 
     # QC the aligned but unsorted readgroup BAM
     # no reference as the input here is unsorted, providing a reference would cause an error
-    call QC.CollectUnsortedReadgroupBamQualityMetrics as CollectUnsortedReadgroupBamQualityMetrics {
-      input:
-        input_bam = output_aligned_bam,
-        output_bam_prefix = unmapped_bam_basename + ".readgroup",
-        preemptible_tries = papi_settings.preemptible_tries
-    }
+    #call QC.CollectUnsortedReadgroupBamQualityMetrics as CollectUnsortedReadgroupBamQualityMetrics {
+    #  input:
+    #    input_bam = output_aligned_bam,
+    #    output_bam_prefix = unmapped_bam_basename + ".readgroup",
+    #    preemptible_tries = papi_settings.preemptible_tries
+    #}
   }
 
   # Sum the read group bam sizes to approximate the aggregated bam size
@@ -195,19 +195,19 @@ workflow UnmappedBamToAlignedBam {
   }
 
   # Estimate level of cross-sample contamination
-  call Processing.CheckContamination as CheckContamination {
-    input:
-      input_bam = SortSampleBam.output_bam,
-      input_bam_index = SortSampleBam.output_bam_index,
-      contamination_sites_ud = contamination_sites_ud,
-      contamination_sites_bed = contamination_sites_bed,
-      contamination_sites_mu = contamination_sites_mu,
-      ref_fasta = references.reference_fasta.ref_fasta,
-      ref_fasta_index = references.reference_fasta.ref_fasta_index,
-      output_prefix = sample_and_unmapped_bams.base_file_name + ".preBqsr",
-      preemptible_tries = papi_settings.agg_preemptible_tries,
-      contamination_underestimation_factor = 0.75
-  }
+  #call Processing.CheckContamination as CheckContamination {
+  #  input:
+  #    input_bam = SortSampleBam.output_bam,
+  #    input_bam_index = SortSampleBam.output_bam_index,
+  #    contamination_sites_ud = contamination_sites_ud,
+  #    contamination_sites_bed = contamination_sites_bed,
+  #    contamination_sites_mu = contamination_sites_mu,
+  #    ref_fasta = references.reference_fasta.ref_fasta,
+  #    ref_fasta_index = references.reference_fasta.ref_fasta_index,
+  #    output_prefix = sample_and_unmapped_bams.base_file_name + ".preBqsr",
+  #    preemptible_tries = papi_settings.agg_preemptible_tries,
+  #    contamination_underestimation_factor = 0.75
+  #}
 
   # We need disk to localize the sharded input and output due to the scatter for BQSR.
   # If we take the number we are scattering by and reduce by 3 we will have enough disk space
@@ -281,21 +281,21 @@ workflow UnmappedBamToAlignedBam {
 
   # Outputs that will be retained when execution is complete
   output {
-    Array[File] quality_yield_metrics = CollectQualityYieldMetrics.quality_yield_metrics
+    #Array[File] quality_yield_metrics = CollectQualityYieldMetrics.quality_yield_metrics
 
-    Array[File] unsorted_read_group_base_distribution_by_cycle_pdf = CollectUnsortedReadgroupBamQualityMetrics.base_distribution_by_cycle_pdf
-    Array[File] unsorted_read_group_base_distribution_by_cycle_metrics = CollectUnsortedReadgroupBamQualityMetrics.base_distribution_by_cycle_metrics
-    Array[File] unsorted_read_group_insert_size_histogram_pdf = CollectUnsortedReadgroupBamQualityMetrics.insert_size_histogram_pdf
-    Array[File] unsorted_read_group_insert_size_metrics = CollectUnsortedReadgroupBamQualityMetrics.insert_size_metrics
-    Array[File] unsorted_read_group_quality_by_cycle_pdf = CollectUnsortedReadgroupBamQualityMetrics.quality_by_cycle_pdf
-    Array[File] unsorted_read_group_quality_by_cycle_metrics = CollectUnsortedReadgroupBamQualityMetrics.quality_by_cycle_metrics
-    Array[File] unsorted_read_group_quality_distribution_pdf = CollectUnsortedReadgroupBamQualityMetrics.quality_distribution_pdf
-    Array[File] unsorted_read_group_quality_distribution_metrics = CollectUnsortedReadgroupBamQualityMetrics.quality_distribution_metrics
+    #Array[File] unsorted_read_group_base_distribution_by_cycle_pdf = CollectUnsortedReadgroupBamQualityMetrics.base_distribution_by_cycle_pdf
+    #Array[File] unsorted_read_group_base_distribution_by_cycle_metrics = CollectUnsortedReadgroupBamQualityMetrics.base_distribution_by_cycle_metrics
+    #Array[File] unsorted_read_group_insert_size_histogram_pdf = CollectUnsortedReadgroupBamQualityMetrics.insert_size_histogram_pdf
+    #Array[File] unsorted_read_group_insert_size_metrics = CollectUnsortedReadgroupBamQualityMetrics.insert_size_metrics
+    #Array[File] unsorted_read_group_quality_by_cycle_pdf = CollectUnsortedReadgroupBamQualityMetrics.quality_by_cycle_pdf
+    #Array[File] unsorted_read_group_quality_by_cycle_metrics = CollectUnsortedReadgroupBamQualityMetrics.quality_by_cycle_metrics
+    #Array[File] unsorted_read_group_quality_distribution_pdf = CollectUnsortedReadgroupBamQualityMetrics.quality_distribution_pdf
+    #Array[File] unsorted_read_group_quality_distribution_metrics = CollectUnsortedReadgroupBamQualityMetrics.quality_distribution_metrics
 
     File? cross_check_fingerprints_metrics = CrossCheckFingerprints.cross_check_fingerprints_metrics
 
-    File selfSM = CheckContamination.selfSM
-    Float contamination = CheckContamination.contamination
+    #File selfSM = CheckContamination.selfSM
+    #Float contamination = CheckContamination.contamination
 
     File duplicate_metrics = MarkDuplicates.duplicate_metrics
     File? output_bqsr_reports = GatherBqsrReports.output_bqsr_report
