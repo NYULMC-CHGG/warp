@@ -51,6 +51,7 @@ task SortSam {
     cpu: "1"
     memory: "${machine_mem_mb} MiB"
     preemptible: preemptible_tries
+    runtime_minutes: 60
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -113,6 +114,7 @@ task MarkDuplicates {
     memory: "~{memory_size} GiB"
     cpu: 1
     disks: "local-disk " + disk_size + " HDD"
+    runtime_minutes: 90
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -303,6 +305,7 @@ task GatherSortedBamFiles {
     memory: "${machine_mem_mb} MiB"
     cpu: 1
     disks: "local-disk " + disk_size + " HDD"
+    runtime_minutes: 20
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -474,6 +477,7 @@ task CheckContamination {
     disks: "local-disk " + disk_size + " HDD"
     docker: "us.gcr.io/broad-gotc-prod/verify-bam-id:1.0.1-c1cba76e979904eb69c31520a0d7f5be63c72253-1639071840"
     cpu: 1
+    runtime_minutes: 20
   }
   output {
     File selfSM = "~{output_prefix}.selfSM"

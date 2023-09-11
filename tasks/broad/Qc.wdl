@@ -276,6 +276,7 @@ task CrossCheckFingerprints {
     preemptible: preemptible_tries
     memory: "3500 MiB"
     cpu: "1"
+    runtime_minutes: 20
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -656,6 +657,7 @@ task ValidateVCF {
     cpu: "1"
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
+    runtime_minutes: 60
   }
 }
 
@@ -690,6 +692,7 @@ task CollectVariantCallingMetrics {
     preemptible: preemptible_tries
     memory: "15000 MiB"
     cpu: "1"
+    runtime_minutes: 60
     disks: "local-disk " + disk_size + " HDD"
   }
   output {

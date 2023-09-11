@@ -36,6 +36,8 @@ workflow VariantCalling {
     Boolean use_gatk3_haplotype_caller = false
     Boolean skip_reblocking = false
     Boolean use_dragen_hard_filtering = false
+    File allele_vcf
+    File allele_index
   }
 
   parameter_meta {
@@ -111,7 +113,9 @@ workflow VariantCalling {
           use_spanning_event_genotyping = use_spanning_event_genotyping,
           dragstr_model = DragstrAutoCalibration.dragstr_model,
           preemptible_tries = agg_preemptible_tries,
-          cpu = 6
+          cpu = 8,
+          allele_vcf = allele_vcf,
+          allele_index = allele_index
        }
 
       if (use_dragen_hard_filtering) {
@@ -243,5 +247,6 @@ task MergeBamouts {
     disks: "local-disk ~{disk_size} HDD"
     preemptible: 3
     cpu: 1
+    runtime_minutes: 60
   }
 }

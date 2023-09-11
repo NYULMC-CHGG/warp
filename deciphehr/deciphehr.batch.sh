@@ -2,9 +2,9 @@
 #SBATCH --job-name=dcipher
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=2
-#SBATCH --mem=10G
-#SBATCH --time=24:00:00
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+#SBATCH --time=96:00:00
 #SBATCH --partition=cpu_medium
 #SBATCH -o ./jobLog/JOB%j.out
 #SBATCH -e ./jobLog/JOB%j.err
@@ -21,4 +21,4 @@ INPUT=$1
 OPTIONS=/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/driver/wdl_options.json
 CE=$PWD/cromwell-executions
 
-java -jar -Xms8g -Xmx10g -Dconfig.file=${CONFIG} ${JAR} run ${WDL} -i ${INPUT} -o ${OPTIONS}
+java -jar -Xms2g -Xmx4g -Dconfig.file=${CONFIG} ${JAR} run ${WDL} -i ${INPUT} -o ${OPTIONS}

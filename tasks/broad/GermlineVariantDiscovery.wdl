@@ -99,12 +99,14 @@ task HaplotypeCaller_GATK4_VCF {
     String gatk_docker = "us.gcr.io/broad-gatk/gatk:4.3.0.0"
     Int memory_multiplier = 1
     Int cpu
+    File allele_vcf
+    File allele_index
   }
   
   #Int memory_size_mb = ceil(50000 * memory_multiplier)
   #Int memory_size_mb = 50000
   #Int memory_size_mb = 10000
-  Int memory_size_mb = 12000
+  Int memory_size_mb = 15000
 
   String output_suffix = if make_gvcf then ".g.vcf.gz" else ".vcf.gz"
   String output_file_name = vcf_basename + output_suffix
@@ -138,9 +140,10 @@ task HaplotypeCaller_GATK4_VCF {
       -I ~{input_bam} \
       -L ~{interval_list} \
       -O ~{output_file_name} \
-      --native-pair-hmm-threads 5 \
+      --native-pair-hmm-threads 7 \
       -contamination ~{default=0 contamination} \
       -G StandardAnnotation -G StandardHCAnnotation ~{true="-G AS_StandardAnnotation" false="" make_gvcf} \
+      --alleles ~{allele_vcf} \
       ~{true="--dragen-mode" false="" run_dragen_mode_variant_calling} \
       ~{false="--disable-spanning-event-genotyping" true="" use_spanning_event_genotyping} \
       ~{if defined(dragstr_model) then "--dragstr-params-path " + dragstr_model else ""} \
@@ -157,7 +160,7 @@ task HaplotypeCaller_GATK4_VCF {
     preemptible: preemptible_tries
     memory: "~{memory_size_mb} MiB"
     cpu: cpu
-    runtime_minutes: 210
+    runtime_minutes: 900
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -194,6 +197,7 @@ task MergeVCFs {
     memory: "5000 MiB"
     cpu: 1
     disks: "local-disk ~{disk_size} HDD"
+    runtime_minutes: 90
   }
   output {
     File output_vcf = "~{output_vcf_name}"
@@ -239,6 +243,7 @@ task Reblock {
     bootDiskSizeGb: 15
     preemptible: 3
     docker: docker_image
+    runtime_minutes: 180
   }
 
   output {
@@ -317,6 +322,7 @@ task DragenHardFilterVcf {
     memory: "3000 MiB"
     bootDiskSizeGb: 15
     cpu: 1
+    runtime_minutes: 40
     disks: "local-disk " + disk_size + " HDD"
   }
 }

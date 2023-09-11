@@ -68,6 +68,7 @@ task CalibrateDragstrModel {
      memory: runtime_memory_mb + " MiB"
      preemptible: preemptible_tries
      cpu: java_threads
+     runtime_minutes: 30
   }
 
   output {

@@ -10,12 +10,14 @@ workflow Deciphehr{
 
     #inputs
     input{
-        File dnaSeqSSRef = "/gpfs/data/chaklab/home/mccafj02/home/repos/warp/structs/dna_seq/DNASeqSingleSampleReferences.json"
-        File dragMapRef = "/gpfs/data/chaklab/home/mccafj02/home/repos/warp/structs/dna_seq/DragmapReference.json"
-        File papiSettings = "/gpfs/data/chaklab/home/mccafj02/home/repos/warp/structs/dna_seq/PapiSettings.json"
-        File variantCallScatter = "/gpfs/data/chaklab/home/mccafj02/home/repos/warp/structs/dna_seq/VariantCallingScatterSettings.json"
+        File dnaSeqSSRef = "/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/warp/structs/dna_seq/DNASeqSingleSampleReferences.json"
+        File dragMapRef = "/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/warp/structs/dna_seq/DragmapReference.json"
+        File papiSettings = "/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/warp/structs/dna_seq/PapiSettings.json"
+        File variantCallScatter = "/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/warp/structs/dna_seq/VariantCallingScatterSettings.json"
         SampleFastq sample_fastq
         File wgs_coverage_interval_list = "/gpfs/data/chaklab/home/mccafj02/pipelines/reference/hg38/v0/wgs_coverage_regions.hg38.interval_list"
+        File allele_vcf = "/gpfs/home/mccafj02/scratch/DECIPHEHR/pipeline/driver/KA/variant_1000g_key.vcf.gz"
+        File allele_index = "/gpfs/home/mccafj02/scratch/DECIPHEHR/pipeline/driver/KA/variant_1000g_key.vcf.gz.tbi"
         Boolean isXY = false
 
     }
@@ -53,7 +55,9 @@ workflow Deciphehr{
             papi_settings = papi_settings,
             dragen_functional_equivalence_mode = true,
             provide_bam_output = true,
-            allow_empty_ref_alt = true
+            allow_empty_ref_alt = true,
+            allele_vcf = allele_vcf,
+            allele_index = allele_index
 
     }
 
@@ -81,9 +85,11 @@ workflow Deciphehr{
                     input_bam_index = wgs.output_bam_index,
                     region = x.region,
                     ploidy = x.ploidy,
-                    mem_size_mb = 12000,
-                    cpu = 6,
-                    id = x.id
+                    mem_size_mb = 15000,
+                    cpu = 8,
+                    id = x.id,
+                    allele_vcf = allele_vcf,
+                    allele_index = allele_index
 
                 }
             }
@@ -200,6 +206,7 @@ task SampleStruct{
     runtime{
         cpu: 1
         memory: "1000 MiB"
+        runtime_minutes: 2
     }
 }
 task ConvertFastqToUbam {
@@ -231,6 +238,7 @@ task ConvertFastqToUbam {
         docker: "us.gcr.io/broad-gotc-prod/dragmap:1.1.2-1.2.1-2.26.10-1.11-1643839530"
         cpu: 1
         memory: "9000 MiB"
+        runtime_minutes: 150
     }
 }
 task XYtyping {
@@ -273,6 +281,7 @@ task XYtyping {
         docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
         cpu: 1
         memory: "5000 MiB"
+        runtime_minutes: 30
     }
 }
 task XYregions{
@@ -292,6 +301,7 @@ task XYregions{
     runtime{
         cpu: 1
         memory: "1000 MiB"
+        runtime_minutes: 2
     }
 }
 task HaplotypeCallerXY{
@@ -306,6 +316,8 @@ task HaplotypeCallerXY{
         String id
         Int mem_size_mb
         Int cpu
+        File allele_vcf
+        File allele_index
         
         
     }
@@ -318,7 +330,8 @@ task HaplotypeCallerXY{
         -I ~{input_bam} \
         -L ~{region} \
         -O ~{id}.vcf.gz \
-        --native-pair-hmm-threads ~{cpu} \
+        --alleles ~{allele_vcf} \
+        --native-pair-hmm-threads 7 \
         -ploidy ~{ploidy} \
         -ERC GVCF \
         -G StandardAnnotation \
@@ -333,7 +346,7 @@ task HaplotypeCallerXY{
     runtime{
         docker:"us.gcr.io/broad-gatk/gatk:4.3.0.0"
         cpu: cpu
-        runtime_minutes: 120
+        runtime_minutes: 900
         memory: "~{mem_size_mb} MiB"
     }
 }
@@ -374,5 +387,6 @@ task FinalVCF {
         docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
         cpu: 1
         memory: "6000 MiB"
+        runtime_minutes: 90
     }
 }
