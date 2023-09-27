@@ -85,7 +85,7 @@ workflow Deciphehr{
                     input_bam_index = wgs.output_bam_index,
                     region = x.region,
                     ploidy = x.ploidy,
-                    mem_size_mb = 15000,
+                    mem_size_mb = 8000,
                     cpu = 8,
                     id = x.id,
                     allele_vcf = allele_vcf,
@@ -111,11 +111,18 @@ workflow Deciphehr{
                 input_vcfs_indexes = MergeVCFs.output_vcf_index,
                 autosome_vcf = wgs.output_vcf,
                 autosome_vcf_index = wgs.output_vcf_index,
-                output_name = sample_fastq.sample_name+"_Final_merged.g.vcf.gz"
+                output_name = sample_fastq.sample_name+"_XY_hard-filtered.g.vcf.gz"
             }
         
         }
-
+    # if( read_boolean(XYtyping.isXY) ){
+    #     File output_vcf = FinalVCF.vcf
+    #     File output_vcf_index = FinalVCF.vcf_index
+    # }
+    # if( !read_boolean(XYtyping.isXY)){
+    #     File output_vcf = wgs.output_vcf
+    #     File output_vcf_index = wgs.output_vcf_index
+    # }
     
 
     ## output everything
@@ -184,6 +191,8 @@ workflow Deciphehr{
         File xytyping = XYtyping.output_ratio
         File? finaVCF = FinalVCF.vcf
         File? finalVCF_index = FinalVCF.vcf_index
+        #File finalVCF = output_vcf
+        #File finalVCF_index = output_vcf_index
     }
     meta {
     allowNestedInputs: true
@@ -346,7 +355,7 @@ task HaplotypeCallerXY{
     runtime{
         docker:"us.gcr.io/broad-gatk/gatk:4.3.0.0"
         cpu: cpu
-        runtime_minutes: 900
+        runtime_minutes: 180
         memory: "~{mem_size_mb} MiB"
     }
 }

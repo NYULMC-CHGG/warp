@@ -1,5 +1,5 @@
 {
-    "reference_bin":"/gpfs/data/chaklab/home/mccafj02/pipelines/reference/hg38/dragen_reference/reference.bin",
-    "hash_table_cfg_bin":"/gpfs/data/chaklab/home/mccafj02/pipelines/reference/hg38/dragen_reference/hash_table.cfg.bin",
-    "hash_table_cmp":"/gpfs/data/chaklab/home/mccafj02/pipelines/reference/hg38/dragen_reference/hash_table.cmp"
+    "reference_bin":"/gpfs/data/deciphEHRlab/pipeline/reference/hg38/dragen_reference/reference.bin",
+    "hash_table_cfg_bin":"/gpfs/data/deciphEHRlab/pipeline/reference/hg38/dragen_reference/hash_table.cfg.bin",
+    "hash_table_cmp":"/gpfs/data/deciphEHRlab/pipeline/reference/hg38/dragen_reference/hash_table.cmp"
 }

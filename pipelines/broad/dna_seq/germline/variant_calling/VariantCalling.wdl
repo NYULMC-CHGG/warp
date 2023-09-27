@@ -177,21 +177,22 @@ workflow VariantCalling {
   }
 
   # Validate the (g)VCF output of HaplotypeCaller
-  call QC.ValidateVCF as ValidateVCF {
-    input:
-      input_vcf = select_first([Reblock.output_vcf, MergeVCFs.output_vcf]),
-      input_vcf_index = select_first([Reblock.output_vcf_index, MergeVCFs.output_vcf_index]),
-      dbsnp_vcf = dbsnp_vcf,
-      dbsnp_vcf_index = dbsnp_vcf_index,
-      ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      ref_dict = ref_dict,
-      calling_interval_list = calling_interval_list,
-      is_gvcf = make_gvcf,
-      extra_args = "--no-overlaps",
-      gatk_docker = "us.gcr.io/broad-gatk/gatk:4.3.0.0",
-      preemptible_tries = agg_preemptible_tries
-  }
+  # NOT used RM from workflow
+  # call QC.ValidateVCF as ValidateVCF {
+  #   input:
+  #     input_vcf = select_first([Reblock.output_vcf, MergeVCFs.output_vcf]),
+  #     input_vcf_index = select_first([Reblock.output_vcf_index, MergeVCFs.output_vcf_index]),
+  #     dbsnp_vcf = dbsnp_vcf,
+  #     dbsnp_vcf_index = dbsnp_vcf_index,
+  #     ref_fasta = ref_fasta,
+  #     ref_fasta_index = ref_fasta_index,
+  #     ref_dict = ref_dict,
+  #     calling_interval_list = calling_interval_list,
+  #     is_gvcf = make_gvcf,
+  #     #extra_args = "--no-overlaps",
+  #     gatk_docker = "us.gcr.io/broad-gatk/gatk:4.3.0.0",
+  #     preemptible_tries = agg_preemptible_tries
+  # }
 
   # QC the (g)VCF
   call QC.CollectVariantCallingMetrics as CollectVariantCallingMetrics {

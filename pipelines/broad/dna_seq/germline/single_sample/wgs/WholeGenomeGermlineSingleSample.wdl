@@ -198,7 +198,7 @@ workflow WholeGenomeGermlineSingleSample {
       agg_preemptible_tries = papi_settings.agg_preemptible_tries,
       use_gatk3_haplotype_caller = use_gatk3_haplotype_caller_,
       use_dragen_hard_filtering = use_dragen_hard_filtering_,
-      skip_reblocking = false,
+      skip_reblocking = true,
       allele_vcf = allele_vcf,
       allele_index = allele_index
       
