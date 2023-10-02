@@ -10,14 +10,14 @@ workflow Deciphehr{
 
     #inputs
     input{
-        File dnaSeqSSRef = "/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/warp/structs/dna_seq/DNASeqSingleSampleReferences.json"
-        File dragMapRef = "/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/warp/structs/dna_seq/DragmapReference.json"
-        File papiSettings = "/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/warp/structs/dna_seq/PapiSettings.json"
-        File variantCallScatter = "/gpfs/scratch/mccafj02/DECIPHEHR/pipeline/warp/structs/dna_seq/VariantCallingScatterSettings.json"
+        File dnaSeqSSRef = "/gpfs/data/deciphEHRlab/pipeline/warp/structs/dna_seq/DNASeqSingleSampleReferences.json"
+        File dragMapRef = "/gpfs/data/deciphEHRlab/pipeline/warp/structs/dna_seq/DragmapReference.json"
+        File papiSettings = "/gpfs/data/deciphEHRlab/pipeline/warp/structs/dna_seq/PapiSettings.json"
+        File variantCallScatter = "/gpfs/data/deciphEHRlab/pipeline/warp/structs/dna_seq/VariantCallingScatterSettings.json"
         SampleFastq sample_fastq
-        File wgs_coverage_interval_list = "/gpfs/data/chaklab/home/mccafj02/pipelines/reference/hg38/v0/wgs_coverage_regions.hg38.interval_list"
-        File allele_vcf = "/gpfs/home/mccafj02/scratch/DECIPHEHR/pipeline/driver/KA/variant_1000g_key.vcf.gz"
-        File allele_index = "/gpfs/home/mccafj02/scratch/DECIPHEHR/pipeline/driver/KA/variant_1000g_key.vcf.gz.tbi"
+        File wgs_coverage_interval_list = "/gpfs/data/deciphEHRlab/pipeline/reference/hg38/v0/wgs_coverage_regions.hg38.interval_list"
+        File allele_vcf = "/gpfs/data/deciphEHRlab/pipeline/reference/hg38/forceCall/variant_1000g_key.vcf.gz"
+        File allele_index = "/gpfs/data/deciphEHRlab/pipeline/reference/hg38/forceCall/variant_1000g_key.vcf.gz.tbi"
         Boolean isXY = false
 
     }
@@ -85,7 +85,7 @@ workflow Deciphehr{
                     input_bam_index = wgs.output_bam_index,
                     region = x.region,
                     ploidy = x.ploidy,
-                    mem_size_mb = 8000,
+                    mem_size_mb = 20000,
                     cpu = 8,
                     id = x.id,
                     allele_vcf = allele_vcf,
@@ -96,23 +96,23 @@ workflow Deciphehr{
             #gather vcf outputs and merge into a single gvcf file
             Array[File] vcfs_to_merge = flatten(select_all([HaplotypeCallerXY.vcf]))
             Array[File] vcf_indices_to_merge = flatten(select_all([HaplotypeCallerXY.vcf_index]))
-            call Calling.MergeVCFs as MergeVCFs {
+            call Calling.MergeVCFs as XYVCFs {
                 input:
                     input_vcfs = vcfs_to_merge,
                     input_vcfs_indexes = vcf_indices_to_merge,
-                    output_vcf_name = sample_fastq.sample_name+"_XY_autosomes_merged.vcf.gz",
+                    output_vcf_name = sample_fastq.sample_name+"_XY.g.vcf.gz",
             }
-            call FinalVCF {
-            input:
-                fasta_ref = references.reference_fasta.ref_fasta,
-                fasta_index = references.reference_fasta.ref_fasta_index,
-                fasta_dict = references.reference_fasta.ref_dict,
-                xy_vcfs = MergeVCFs.output_vcf,
-                input_vcfs_indexes = MergeVCFs.output_vcf_index,
-                autosome_vcf = wgs.output_vcf,
-                autosome_vcf_index = wgs.output_vcf_index,
-                output_name = sample_fastq.sample_name+"_XY_hard-filtered.g.vcf.gz"
-            }
+            # call FinalVCF {
+            # input:
+            #     fasta_ref = references.reference_fasta.ref_fasta,
+            #     fasta_index = references.reference_fasta.ref_fasta_index,
+            #     fasta_dict = references.reference_fasta.ref_dict,
+            #     xy_vcfs = MergeVCFs.output_vcf,
+            #     input_vcfs_indexes = MergeVCFs.output_vcf_index,
+            #     autosome_vcf = wgs.output_vcf,
+            #     autosome_vcf_index = wgs.output_vcf_index,
+            #     output_name = sample_fastq.sample_name+"_XY_hard-filtered.g.vcf.gz"
+            # }
         
         }
     # if( read_boolean(XYtyping.isXY) ){
@@ -189,8 +189,10 @@ workflow Deciphehr{
         File output_vcf_index = wgs.output_vcf_index
 
         File xytyping = XYtyping.output_ratio
-        File? finaVCF = FinalVCF.vcf
-        File? finalVCF_index = FinalVCF.vcf_index
+        File? xyvcf = XYVCFs.output_vcf
+        File? xyvcf_index = XYVCFs.output_vcf_index
+        #File? finaVCF = FinalVCF.vcf
+        #File? finalVCF_index = FinalVCF.vcf_index
         #File finalVCF = output_vcf
         #File finalVCF_index = output_vcf_index
     }
@@ -355,7 +357,7 @@ task HaplotypeCallerXY{
     runtime{
         docker:"us.gcr.io/broad-gatk/gatk:4.3.0.0"
         cpu: cpu
-        runtime_minutes: 180
+        runtime_minutes: 900
         memory: "~{mem_size_mb} MiB"
     }
 }

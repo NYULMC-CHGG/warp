@@ -106,7 +106,7 @@ task HaplotypeCaller_GATK4_VCF {
   #Int memory_size_mb = ceil(50000 * memory_multiplier)
   #Int memory_size_mb = 50000
   #Int memory_size_mb = 10000
-  Int memory_size_mb = 11000
+  Int memory_size_mb = 20000
 
   String output_suffix = if make_gvcf then ".g.vcf.gz" else ".vcf.gz"
   String output_file_name = vcf_basename + output_suffix
@@ -160,7 +160,7 @@ task HaplotypeCaller_GATK4_VCF {
     preemptible: preemptible_tries
     memory: "~{memory_size_mb} MiB"
     cpu: cpu
-    runtime_minutes: 900
+    runtime_minutes: 1800
     bootDiskSizeGb: 15
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -322,7 +322,7 @@ task DragenHardFilterVcf {
     memory: "3000 MiB"
     bootDiskSizeGb: 15
     cpu: 1
-    runtime_minutes: 40
+    runtime_minutes: 90
     disks: "local-disk " + disk_size + " HDD"
   }
 }
