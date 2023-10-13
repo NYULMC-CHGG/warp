@@ -690,7 +690,7 @@ task CollectVariantCallingMetrics {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/picard-cloud:2.26.10"
     preemptible: preemptible_tries
-    memory: "15000 MiB"
+    memory: "10000 MiB"
     cpu: "1"
     runtime_minutes: 60
     disks: "local-disk " + disk_size + " HDD"

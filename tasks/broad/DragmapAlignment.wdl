@@ -94,7 +94,7 @@ task SamToFastqAndDragmapAndMba {
     preemptible: preemptible_tries
     memory: "${memory_mb} MiB"
     disks: "local-disk ${disk_size_gb} HDD"
-    runtime_minutes: 210
+    runtime_minutes: 420
     cpu: cpu
   }
   output {

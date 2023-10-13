@@ -106,7 +106,7 @@ task HaplotypeCaller_GATK4_VCF {
   #Int memory_size_mb = ceil(50000 * memory_multiplier)
   #Int memory_size_mb = 50000
   #Int memory_size_mb = 10000
-  Int memory_size_mb = 20000
+  Int memory_size_mb = 15000
 
   String output_suffix = if make_gvcf then ".g.vcf.gz" else ".vcf.gz"
   String output_file_name = vcf_basename + output_suffix
@@ -140,7 +140,7 @@ task HaplotypeCaller_GATK4_VCF {
       -I ~{input_bam} \
       -L ~{interval_list} \
       -O ~{output_file_name} \
-      --native-pair-hmm-threads 7 \
+      --native-pair-hmm-threads ~{cpu} \
       -contamination ~{default=0 contamination} \
       -G StandardAnnotation -G StandardHCAnnotation ~{true="-G AS_StandardAnnotation" false="" make_gvcf} \
       --alleles ~{allele_vcf} \
@@ -149,6 +149,7 @@ task HaplotypeCaller_GATK4_VCF {
       ~{if defined(dragstr_model) then "--dragstr-params-path " + dragstr_model else ""} \
       -GQB 10 -GQB 20 -GQB 30 -GQB 40 -GQB 50 -GQB 60 -GQB 70 -GQB 80 -GQB 90 \
       ~{true="-ERC GVCF" false="" make_gvcf} \
+      --smith-waterman FASTEST_AVAILABLE \
       ~{bamout_arg}
 
     # Cromwell doesn't like optional task outputs, so we have to touch this file.

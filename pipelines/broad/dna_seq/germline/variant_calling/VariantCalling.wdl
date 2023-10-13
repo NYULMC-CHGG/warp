@@ -113,7 +113,7 @@ workflow VariantCalling {
           use_spanning_event_genotyping = use_spanning_event_genotyping,
           dragstr_model = DragstrAutoCalibration.dragstr_model,
           preemptible_tries = agg_preemptible_tries,
-          cpu = 8,
+          cpu = 5,
           allele_vcf = allele_vcf,
           allele_index = allele_index
        }

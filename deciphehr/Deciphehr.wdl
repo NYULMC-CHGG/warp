@@ -85,8 +85,8 @@ workflow Deciphehr{
                     input_bam_index = wgs.output_bam_index,
                     region = x.region,
                     ploidy = x.ploidy,
-                    mem_size_mb = 20000,
-                    cpu = 8,
+                    mem_size_mb = 15000,
+                    cpu = 5,
                     id = x.id,
                     allele_vcf = allele_vcf,
                     allele_index = allele_index
@@ -127,48 +127,11 @@ workflow Deciphehr{
 
     ## output everything
     output{
-        #Array[File] quality_yield_metrics = wgs.quality_yield_metrics
-
-        #Array[File] unsorted_read_group_base_distribution_by_cycle_pdf = wgs.unsorted_read_group_base_distribution_by_cycle_pdf
-        #Array[File] unsorted_read_group_base_distribution_by_cycle_metrics = wgs.unsorted_read_group_base_distribution_by_cycle_metrics
-        #Array[File] unsorted_read_group_insert_size_histogram_pdf = wgs.unsorted_read_group_insert_size_histogram_pdf
-        #Array[File] unsorted_read_group_insert_size_metrics = wgs.unsorted_read_group_insert_size_metrics
-        #Array[File] unsorted_read_group_quality_by_cycle_pdf = wgs.unsorted_read_group_quality_by_cycle_pdf
-        #Array[File] unsorted_read_group_quality_by_cycle_metrics = wgs.unsorted_read_group_quality_by_cycle_metrics
-        #Array[File] unsorted_read_group_quality_distribution_pdf = wgs.unsorted_read_group_quality_distribution_pdf
-        #Array[File] unsorted_read_group_quality_distribution_metrics = wgs.unsorted_read_group_quality_distribution_metrics
-
-        #File read_group_alignment_summary_metrics = wgs.read_group_alignment_summary_metrics
-        #File read_group_gc_bias_detail_metrics = wgs.read_group_gc_bias_detail_metrics
-        #File read_group_gc_bias_pdf = wgs.read_group_gc_bias_pdf
-        #File read_group_gc_bias_summary_metrics = wgs.read_group_gc_bias_summary_metrics
+       
 
         File? cross_check_fingerprints_metrics = wgs.cross_check_fingerprints_metrics
 
-        #File selfSM = wgs.selfSM
-        #Float contamination = wgs.contamination
-
-        #File calculate_read_group_checksum_md5 = wgs.calculate_read_group_checksum_md5
-
-        #File agg_alignment_summary_metrics = wgs.agg_alignment_summary_metrics
-        #File agg_bait_bias_detail_metrics = wgs.agg_bait_bias_detail_metrics
-        #File agg_bait_bias_summary_metrics = wgs.agg_bait_bias_summary_metrics
-        #File agg_gc_bias_detail_metrics = wgs.agg_gc_bias_detail_metrics
-        #File agg_gc_bias_pdf = wgs.agg_gc_bias_pdf
-        #File agg_gc_bias_summary_metrics = wgs.agg_gc_bias_summary_metrics
-        #File agg_insert_size_histogram_pdf = wgs.agg_insert_size_histogram_pdf
-        #File agg_insert_size_metrics = wgs.agg_insert_size_metrics
-        #File agg_pre_adapter_detail_metrics = wgs.agg_pre_adapter_detail_metrics
-        #File agg_pre_adapter_summary_metrics = wgs.agg_pre_adapter_summary_metrics
-        #File agg_quality_distribution_pdf = wgs.agg_quality_distribution_pdf
-        #File agg_quality_distribution_metrics = wgs.agg_quality_distribution_metrics
-        #File agg_error_summary_metrics = wgs.agg_error_summary_metrics
-
-        #File? fingerprint_summary_metrics = wgs.fingerprint_summary_metrics
-        #File? fingerprint_detail_metrics = wgs.fingerprint_detail_metrics
-
-        #File wgs_metrics = wgs.wgs_metrics
-        #File raw_wgs_metrics = wgs.raw_wgs_metrics
+        
 
         File duplicate_metrics = wgs.duplicate_metrics
         File? output_bqsr_reports = wgs.output_bqsr_reports
@@ -179,22 +142,13 @@ workflow Deciphehr{
         File? output_bam = wgs.output_bam
         File? output_bam_index = wgs.output_bam_index
 
-        #File output_cram = wgs.output_cram
-        #File output_cram_index = wgs.output_cram_index
-        #File output_cram_md5 = wgs.output_cram_md5
-
-        #File validate_cram_file_report = wgs.validate_cram_file_report
-
         File output_vcf = wgs.output_vcf
         File output_vcf_index = wgs.output_vcf_index
 
         File xytyping = XYtyping.output_ratio
         File? xyvcf = XYVCFs.output_vcf
         File? xyvcf_index = XYVCFs.output_vcf_index
-        #File? finaVCF = FinalVCF.vcf
-        #File? finalVCF_index = FinalVCF.vcf_index
-        #File finalVCF = output_vcf
-        #File finalVCF_index = output_vcf_index
+        
     }
     meta {
     allowNestedInputs: true
@@ -291,7 +245,7 @@ task XYtyping {
     runtime{
         docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
         cpu: 1
-        memory: "5000 MiB"
+        memory: "800 MiB"
         runtime_minutes: 30
     }
 }
@@ -311,7 +265,7 @@ task XYregions{
     }
     runtime{
         cpu: 1
-        memory: "1000 MiB"
+        memory: "800 MiB"
         runtime_minutes: 2
     }
 }
@@ -342,13 +296,14 @@ task HaplotypeCallerXY{
         -L ~{region} \
         -O ~{id}.vcf.gz \
         --alleles ~{allele_vcf} \
-        --native-pair-hmm-threads 7 \
+        --native-pair-hmm-threads ~{cpu} \
         -ploidy ~{ploidy} \
         -ERC GVCF \
         -G StandardAnnotation \
         -G StandardHCAnnotation \
         -G AS_StandardAnnotation \
-        -RF OverclippedReadFilter
+        -RF OverclippedReadFilter \
+        --smith-waterman FASTEST_AVAILABLE
     >>>
     output{
         File vcf = "~{id}.vcf.gz"
