@@ -692,7 +692,7 @@ task CollectVariantCallingMetrics {
     preemptible: preemptible_tries
     memory: "10000 MiB"
     cpu: "1"
-    runtime_minutes: 60
+    runtime_minutes: 120
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
