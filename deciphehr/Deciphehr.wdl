@@ -86,7 +86,7 @@ workflow Deciphehr{
                     region = x.region,
                     ploidy = x.ploidy,
                     mem_size_mb = 15000,
-                    cpu = 5,
+                    cpu = 10,
                     id = x.id,
                     allele_vcf = allele_vcf,
                     allele_index = allele_index
