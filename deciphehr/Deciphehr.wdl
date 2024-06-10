@@ -102,19 +102,21 @@ workflow Deciphehr{
                     input_vcfs_indexes = vcf_indices_to_merge,
                     output_vcf_name = sample_fastq.sample_name+"_XY.g.vcf.gz",
             }
-            # call FinalVCF {
-            # input:
-            #     fasta_ref = references.reference_fasta.ref_fasta,
-            #     fasta_index = references.reference_fasta.ref_fasta_index,
-            #     fasta_dict = references.reference_fasta.ref_dict,
-            #     xy_vcfs = MergeVCFs.output_vcf,
-            #     input_vcfs_indexes = MergeVCFs.output_vcf_index,
-            #     autosome_vcf = wgs.output_vcf,
-            #     autosome_vcf_index = wgs.output_vcf_index,
-            #     output_name = sample_fastq.sample_name+"_XY_hard-filtered.g.vcf.gz"
-            # }
+            call CorrectedVCF {
+            input:
+                fasta_ref = references.reference_fasta.ref_fasta,
+                fasta_index = references.reference_fasta.ref_fasta_index,
+                fasta_dict = references.reference_fasta.ref_dict,
+                xy_vcfs = XYVCFs.output_vcf,
+                input_vcfs_indexes = XYVCFs.output_vcf_index,
+                autosome_vcf = wgs.output_vcf,
+                autosome_vcf_index = wgs.output_vcf_index,
+                output_name = sample_fastq.sample_name+"XYcorrected_hard-filtered.g.vcf.gz"
+            }
         
         }
+    
+      
     # if( read_boolean(XYtyping.isXY) ){
     #     File output_vcf = FinalVCF.vcf
     #     File output_vcf_index = FinalVCF.vcf_index
@@ -146,8 +148,8 @@ workflow Deciphehr{
         File output_vcf_index = wgs.output_vcf_index
 
         File xytyping = XYtyping.output_ratio
-        File? xyvcf = XYVCFs.output_vcf
-        File? xyvcf_index = XYVCFs.output_vcf_index
+        File? xyvcf = CorrectedVCF.output_vcf
+        File? xyvcf_index = CorrectedVCF.output_vcf_index
         
     }
     meta {
@@ -316,7 +318,7 @@ task HaplotypeCallerXY{
         memory: "~{mem_size_mb} MiB"
     }
 }
-task FinalVCF {
+task CorrectedVCF {
     input{
         File fasta_ref
         File fasta_index
@@ -346,8 +348,8 @@ task FinalVCF {
         -O ~{output_name}
     >>>
     output{
-        File vcf = "~{output_name}"
-        File vcf_index = "~{output_name}.tbi"
+        File output_vcf = "~{output_name}"
+        File output_vcf_index = "~{output_name}.tbi"
     }
     runtime{
         docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
