@@ -86,7 +86,7 @@ workflow VariantCalling {
           ref_dict = ref_dict,
           ref_fasta = ref_fasta,
           ref_fasta_index = ref_fasta_index,
-          contamination = contamination,
+          contamination = 0,
           preemptible_tries = agg_preemptible_tries,
           hc_scatter = hc_divisor
       }

@@ -51,7 +51,7 @@ task SortSam {
     cpu: "1"
     memory: "${machine_mem_mb} MiB"
     preemptible: preemptible_tries
-    runtime_minutes: 60
+    runtime_minutes: 180
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -169,6 +169,7 @@ task BaseRecalibrator {
     preemptible: preemptible_tries
     memory: "6000 MiB"
     bootDiskSizeGb: 15
+    runtime_minutes: 25
     cpu: 2
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -237,6 +238,7 @@ task ApplyBQSR {
     memory: "~{memory_size} MiB"
     bootDiskSizeGb: 15
     cpu: 2
+    runtime_minutes: 120
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -265,6 +267,7 @@ task GatherBqsrReports {
     preemptible: preemptible_tries
     memory: "3500 MiB"
     cpu: 2
+    runtime_minutes: 30
     bootDiskSizeGb: 15
     disks: "local-disk 20 HDD"
   }

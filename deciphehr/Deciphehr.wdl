@@ -18,7 +18,7 @@ workflow Deciphehr{
         File wgs_coverage_interval_list = "/gpfs/data/deciphEHRlab/pipeline/reference/hg38/v0/wgs_coverage_regions.hg38.interval_list"
         File allele_vcf = "/gpfs/data/deciphEHRlab/pipeline/reference/hg38/forceCall/variant_1000g_key.vcf.gz"
         File allele_index = "/gpfs/data/deciphEHRlab/pipeline/reference/hg38/forceCall/variant_1000g_key.vcf.gz.tbi"
-        Boolean isXY = false
+        Boolean dragen_functional_equivalence_mode = false
 
     }
 
@@ -53,7 +53,7 @@ workflow Deciphehr{
             dragmap_reference = dragmap_reference,
             scatter_settings = scatter_settings,
             papi_settings = papi_settings,
-            dragen_functional_equivalence_mode = true,
+            dragen_functional_equivalence_mode = dragen_functional_equivalence_mode,
             provide_bam_output = true,
             allow_empty_ref_alt = true,
             allele_vcf = allele_vcf,
@@ -71,6 +71,7 @@ workflow Deciphehr{
     }
     #isXY = read_boolean(XYtyping.isXY)
     ## if XY
+    if ( dragen_functional_equivalence_mode){
         if( read_boolean(XYtyping.isXY) ){
             ## call variants on X and Y par/non-par regions
             call XYregions{}
@@ -116,7 +117,7 @@ workflow Deciphehr{
         
         }
     
-      
+    }
     # if( read_boolean(XYtyping.isXY) ){
     #     File output_vcf = FinalVCF.vcf
     #     File output_vcf_index = FinalVCF.vcf_index
@@ -183,7 +184,9 @@ task ConvertFastqToUbam {
 
     command <<<
 
-       java -Xmx8G -jar /picard/picard.jar FastqToSam \
+       #java -Xmx8G -jar /picard/picard.jar FastqToSam \
+       gatk --java-options "-Xmx8G" \
+       FastqToSam \
        FASTQ=~{sample_fastq.r1} \
        FASTQ2=~{sample_fastq.r2} \
        OUTPUT=~{sample_fastq.sample_name}_unmapped.bam \
@@ -202,10 +205,12 @@ task ConvertFastqToUbam {
 
     }
     runtime{
-        docker: "us.gcr.io/broad-gotc-prod/dragmap:1.1.2-1.2.1-2.26.10-1.11-1643839530"
+        #docker: "us.gcr.io/broad-gotc-prod/dragmap:1.1.2-1.2.1-2.26.10-1.11-1643839530"
+        #cpu: 1
+        docker: "us.gcr.io/broad-gatk/gatk:4.3.0.0"
         cpu: 1
         memory: "9000 MiB"
-        runtime_minutes: 150
+        runtime_minutes: 240
     }
 }
 task XYtyping {

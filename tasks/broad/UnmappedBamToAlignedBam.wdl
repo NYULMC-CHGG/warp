@@ -186,7 +186,7 @@ workflow UnmappedBamToAlignedBam {
         preemptible_tries = papi_settings.agg_preemptible_tries
     }
   }
-
+  if(perform_bqsr){
   # Create list of sequences for scatter-gather parallelization
   call Utils.CreateSequenceGroupingTSV as CreateSequenceGroupingTSV {
     input:
@@ -212,9 +212,11 @@ workflow UnmappedBamToAlignedBam {
   # We need disk to localize the sharded input and output due to the scatter for BQSR.
   # If we take the number we are scattering by and reduce by 3 we will have enough disk space
   # to account for the fact that the data is not split evenly.
+  
   Int num_of_bqsr_scatters = length(CreateSequenceGroupingTSV.sequence_grouping)
   Int potential_bqsr_divisor = num_of_bqsr_scatters - 10
   Int bqsr_divisor = if potential_bqsr_divisor > 1 then potential_bqsr_divisor else 1
+  
 
   # Perform Base Quality Score Recalibration (BQSR) on the sorted BAM in parallel
 
@@ -267,6 +269,7 @@ workflow UnmappedBamToAlignedBam {
           somatic = somatic
       }
     }
+  }
   }
 
   # Merge the recalibrated BAM files resulting from by-interval recalibration

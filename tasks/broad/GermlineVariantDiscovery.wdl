@@ -68,9 +68,10 @@ task HaplotypeCaller_GATK35_GVCF {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/gatk:1.3.0-4.2.6.1-1649964384"
     preemptible: preemptible_tries
-    memory: "10000 MiB"
+    memory: "14000 MiB"
     cpu: "1"
     disks: "local-disk " + disk_size + " HDD"
+    runtime_minutes: 1800
   }
   output {
     File output_gvcf = "~{gvcf_basename}.vcf.gz"
@@ -198,7 +199,7 @@ task MergeVCFs {
     memory: "5000 MiB"
     cpu: 1
     disks: "local-disk ~{disk_size} HDD"
-    runtime_minutes: 90
+    runtime_minutes: 180
   }
   output {
     File output_vcf = "~{output_vcf_name}"

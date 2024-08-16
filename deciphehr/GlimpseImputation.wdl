@@ -118,7 +118,7 @@ task GlimpseLigate {
         memory : mem_gb +" GiB"
         cpu: cpu
         maxRetries: max_retries
-        runtime_minutes: 60
+        runtime_minutes: 120
     }
 
 }
